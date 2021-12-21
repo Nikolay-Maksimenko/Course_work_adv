@@ -1,10 +1,10 @@
-from sqlalchemy import Integer, String, Date, Boolean, Column, ForeignKey, create_engine
+from sqlalchemy import Integer, String, Column, ForeignKey, create_engine
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
-import os
+import settings
 Base = declarative_base()
-s = os.getenv('BD_USER')
-engine = create_engine(f'postgresql://{os.getenv("BD_USER")}:{os.getenv("BD_PWD")}@localhost:5432/vkinder')
+
+engine = create_engine(settings.db_setting)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -32,10 +32,23 @@ class Photos(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     owner_id = Column(Integer, nullable=False)
     photo_id = Column(Integer, nullable=False)
-    url = Column(String, nullable=False, unique=True)
+    url = Column(String, nullable=False)
+
+class BlackList(Base):
+    __tablename__ = 'black_list'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    vkinder_id = Column(Integer, nullable=False)
+    couple_id = Column(Integer, nullable=False)
+
+class WhiteList(Base):
+    __tablename__ = 'white_list'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    vkinder_id = Column(Integer, nullable=False)
+    couple_id = Column(Integer, nullable=False)
+    first_name = Column(String)
+    last_name = Column(String)
+    url = Column(String, nullable=False)
 
 def create_tables():
     engine.connect().execute("""drop table dating_user, vkinder_user, photos;""")
     Base.metadata.create_all(engine)
-
-create_tables()
